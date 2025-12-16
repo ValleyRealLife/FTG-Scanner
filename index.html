@@ -38,7 +38,7 @@
     </style>
 </head>
 <body>
-    <video id="video" playsinline></video>
+    <video id="video" playsinline autoplay></video>
     <canvas id="canvas"></canvas>
     <div id="result"></div>
 
@@ -48,13 +48,18 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Start camera
+        // Mark that permission was granted
+        localStorage.setItem('cameraGranted', 'true');
+        
+        // Start camera immediately
         navigator.mediaDevices.getUserMedia({ 
             video: { facingMode: "environment" } 
         }).then(stream => {
             video.srcObject = stream;
             video.play();
             requestAnimationFrame(scan);
+        }).catch(err => {
+            document.getElementById('result').innerHTML = '<div style="color: #f44336; padding: 20px;">Camera access required</div>';
         });
 
         function scan() {
