@@ -24,7 +24,7 @@
             max-width: 500px;
             border: 2px solid #333;
             border-radius: 8px;
-            pointer-events: none; /* Disables all touch/click interactions */
+            pointer-events: none;
         }
         .success {
             text-align: center;
@@ -48,9 +48,7 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        
-        // Mark that permission was granted
-        localStorage.setItem('cameraGranted', 'true');
+        let scanningEnabled = false;
         
         // Start camera immediately
         navigator.mediaDevices.getUserMedia({ 
@@ -58,13 +56,19 @@
         }).then(stream => {
             video.srcObject = stream;
             video.play();
+            
+            // Wait 5 seconds before enabling scanning
+            setTimeout(() => {
+                scanningEnabled = true;
+            }, 5000);
+            
             requestAnimationFrame(scan);
         }).catch(err => {
             document.getElementById('result').innerHTML = '<div style="color: #f44336; padding: 20px;">Camera access required</div>';
         });
 
         function scan() {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            if (scanningEnabled && video.readyState === video.HAVE_ENOUGH_DATA) {
                 canvas.height = video.videoHeight;
                 canvas.width = video.videoWidth;
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
